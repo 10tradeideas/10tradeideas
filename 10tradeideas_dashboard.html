@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10 Trade Ideas — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0D1117;
+  --bg2: #111827;
+  --bg3: #0a0e13;
+  --border: #1e2530;
+  --green: #3DDC6B;
+  --green-dim: rgba(61,220,107,0.12);
+  --green-border: rgba(61,220,107,0.25);
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --blue: #60a5fa;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --font: 'Syne', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; min-height: 100vh; }
+
+/* TOPBAR */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark {
+  width: 30px; height: 30px; background: var(--green); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; color: #0D1117; letter-spacing: -.5px;
+}
+.logo-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.logo-sub { font-size: 11px; color: var(--green); font-family: var(--mono); margin-left: 2px; }
+.live-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green-dim); border: 1px solid var(--green-border);
+  border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--green);
+  font-family: var(--mono);
+}
+.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-btn {
+  background: none; border: 1px solid var(--border); color: var(--text2);
+  padding: 6px 12px; border-radius: 7px; font-size: 12px; cursor: pointer;
+  font-family: var(--font); transition: all .15s;
+}
+.topbar-btn:hover { border-color: var(--green); color: var(--green); }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--green-dim); border: 1px solid var(--green-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--green);
+}
+
+/* LAYOUT */
+.layout { display: flex; height: calc(100vh - 54px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 210px; flex-shrink: 0;
+  background: var(--bg3); border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 16px 12px;
+  scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+.sb-section { margin-bottom: 20px; }
+.sb-label {
+  font-size: 9px; color: var(--text3); text-transform: uppercase;
+  letter-spacing: .1em; margin-bottom: 8px; padding: 0 4px;
+  font-family: var(--mono);
+}
+
+/* Context Banner */
+.ctx-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px; margin-bottom: 4px;
+}
+.ctx-states { display: flex; gap: 3px; margin-bottom: 8px; }
+.ctx-btn {
+  flex: 1; padding: 5px 4px; font-size: 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: none; color: var(--text3);
+  cursor: pointer; font-family: var(--font); transition: all .15s;
+}
+.ctx-btn.active-g { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.ctx-btn.active-o { border-color: var(--amber); background: rgba(245,158,11,.1); color: var(--amber); }
+.ctx-btn.active-r { border-color: var(--red); background: rgba(239,68,68,.1); color: var(--red); }
+.ctx-text { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.ctx-indicator { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ctx-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Filters */
+.filter-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.fchip {
+  padding: 4px 9px; border-radius: 20px; border: 1px solid var(--border);
+  font-size: 11px; color: var(--text3); cursor: pointer;
+  background: none; transition: all .15s; font-family: var(--font);
+}
+.fchip:hover { border-color: var(--text3); color: var(--text2); }
+.fchip.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* Broker */
+.broker-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px;
+}
+.broker-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.broker-tag { font-size: 10px; color: var(--green); font-family: var(--mono); margin-bottom: 8px; }
+.broker-btn {
+  width: 100%; padding: 7px; background: var(--green); color: #0D1117;
+  border: none; border-radius: 7px; font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); transition: opacity .15s;
+}
+.broker-btn:hover { opacity: .9; }
+.broker-disc { font-size: 9px; color: var(--text3); text-align: center; margin-top: 5px; font-family: var(--mono); }
+
+/* Progress */
+.progress-info { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progress-info span { font-size: 11px; color: var(--text2); }
+.pbar { height: 4px; background: var(--border); border-radius: 2px; }
+.pbar-fill { height: 4px; background: var(--green); border-radius: 2px; width: 40%; }
+.progress-sub { font-size: 10px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+
+/* TTP Teaser */
+.ttp-teaser {
+  background: linear-gradient(135deg, rgba(61,220,107,.08), rgba(61,220,107,.03));
+  border: 1px solid var(--green-border); border-radius: 8px;
+  padding: 8px 10px; font-size: 11px; line-height: 1.5;
+}
+.ttp-teaser strong { color: var(--green); display: block; margin-bottom: 2px; }
+.ttp-teaser span { color: var(--text3); }
+
+/* MAIN */
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+/* TABS */
+.tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+  padding: 0 20px; background: var(--bg); flex-shrink: 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 14px 16px; font-size: 13px; color: var(--text3);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; white-space: nowrap;
+  transition: color .15s; font-family: var(--font);
+}
+.tab:hover { color: var(--text2); }
+.tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 20px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+}
+.stat-label { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+.stat-val { font-size: 22px; font-weight: 600; color: var(--text); line-height: 1; }
+.stat-sub { font-size: 10px; color: var(--green); margin-top: 3px; font-family: var(--mono); }
+
+/* FILTER BAR */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.chip {
+  padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border);
+  font-size: 12px; color: var(--text3); cursor: pointer; background: none;
+  transition: all .15s; font-family: var(--font);
+}
+.chip:hover { border-color: var(--text3); color: var(--text2); }
+.chip.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+/* TABLE */
+.table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 10px; color: var(--text3); text-align: left;
+  padding: 10px 12px; border-bottom: 1px solid var(--border);
+  background: var(--bg3); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em;
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid rgba(30,37,48,.6); cursor: pointer; transition: background .12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.02); }
+tbody td { font-size: 12px; padding: 11px 12px; color: var(--text); vertical-align: middle; }
+.inst-name { font-weight: 600; font-size: 13px; }
+.inst-type { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 600; letter-spacing: .03em; font-family: var(--mono); }
+.b-long { background: rgba(61,220,107,.15); color: var(--green); border: 1px solid rgba(61,220,107,.2); }
+.b-short { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
+.b-day { background: rgba(96,165,250,.12); color: var(--blue); border: 1px solid rgba(96,165,250,.2); }
+.b-swing { background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.2); }
+.b-aktiv { background: rgba(61,220,107,.1); color: var(--green); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-family: var(--mono); }
+.b-wait { background: rgba(245,158,11,.1); color: var(--amber); font-size: 10px; padding: 3px 8px; border-radius: 5px; font-family: var(--mono); }
+
+/* ARROW */
+.row-arrow { color: var(--text3); font-size: 12px; transition: transform .2s; display: inline-block; }
+.row-arrow.open { transform: rotate(180deg); color: var(--green); }
+
+/* DETAIL PANEL */
+.detail-row { display: none; }
+.detail-row.open { display: table-row; }
+.detail-panel {
+  background: var(--bg3); padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.detail-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 14px; }
+.detail-block label { font-size: 10px; color: var(--text3); font-family: var(--mono); display: block; margin-bottom: 3px; text-transform: uppercase; }
+.detail-block span { font-size: 16px; font-weight: 600; font-family: var(--mono); }
+.analysis-box {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; font-size: 12px; color: var(--text2); line-height: 1.7;
+  margin-bottom: 12px;
+}
+.chart-placeholder {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  height: 110px; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--text3); margin-bottom: 12px; font-family: var(--mono);
+  flex-direction: column; gap: 6px;
+}
+.chart-icon { font-size: 24px; opacity: .4; }
+
+/* POSITIONSRECHNER */
+.pos-calc {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px; margin-bottom: 12px;
+}
+.pos-title { font-size: 10px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+.pos-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pos-row label { font-size: 11px; color: var(--text2); width: 120px; flex-shrink: 0; }
+.pos-row input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 10px; font-size: 12px; color: var(--text);
+  font-family: var(--mono); outline: none; transition: border-color .15s;
+}
+.pos-row input:focus { border-color: var(--green); }
+.pos-result {
+  background: var(--green-dim); border: 1px solid var(--green-border);
+  border-radius: 6px; padding: 10px 12px; font-size: 12px; color: var(--green);
+  text-align: center; font-family: var(--mono); font-weight: 500;
+}
+
+/* BROKER INLINE */
+.broker-inline {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px;
+}
+.broker-inline-text { font-size: 12px; color: var(--text2); }
+.broker-inline-text strong { color: var(--text); }
+.broker-inline-btn {
+  background: var(--green); color: #0D1117; border: none;
+  padding: 7px 16px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); white-space: nowrap;
+}
+.affiliate-note { font-size: 9px; color: var(--text3); margin-top: 4px; text-align: right; font-family: var(--mono); }
+
+/* NEWS TAB */
+.news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.news-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; transition: border-color .15s; cursor: pointer;
+}
+.news-card:hover { border-color: var(--text3); }
+.news-source { font-size: 10px; color: var(--green); font-family: var(--mono); margin-bottom: 6px; }
+.news-title { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+.news-time { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.cal-section-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.cal-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid rgba(30,37,48,.6);
+}
+.cal-item:last-child { border-bottom: none; }
+.cal-time { font-size: 11px; color: var(--text3); font-family: var(--mono); width: 52px; flex-shrink: 0; }
+.cal-impact { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.cal-hi { background: var(--red); }
+.cal-med { background: var(--amber); }
+.cal-lo { background: var(--green); }
+.cal-title { font-size: 12px; color: var(--text); }
+.cal-curr { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.cal-impact-label { font-size: 10px; color: var(--text3); margin-left: auto; font-family: var(--mono); }
+
+/* TAGEBUCH */
+.j-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.j-stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+.j-val { font-size: 24px; font-weight: 700; color: var(--green); font-family: var(--mono); }
+.j-label { font-size: 10px; color: var(--text3); margin-top: 3px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.j-add { display: flex; gap: 8px; margin-bottom: 16px; }
+.j-add input {
+  flex: 1; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 12px; font-size: 12px; color: var(--text);
+  font-family: var(--font); outline: none; transition: border-color .15s;
+}
+.j-add input:focus { border-color: var(--green); }
+.j-add-btn {
+  background: var(--green); color: #0D1117; border: none;
+  padding: 9px 18px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); white-space: nowrap;
+}
+.j-entry {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 12px;
+}
+.j-inst { font-size: 13px; font-weight: 600; width: 90px; }
+.j-badges { display: flex; gap: 4px; flex: 1; }
+.j-result { font-size: 14px; font-weight: 700; font-family: var(--mono); }
+.j-pos { color: var(--green); }
+.j-neg { color: var(--red); }
+
+/* LERNPFAD */
+.lm { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.lm-header { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.lm-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; font-family: var(--mono); }
+.lm-done { background: var(--green); color: #0D1117; }
+.lm-active { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.lm-locked { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+.lm-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.lm-sub { font-size: 11px; color: var(--text3); margin-top: 1px; font-family: var(--mono); }
+.lm-status { margin-left: auto; }
+.lm-tag { font-size: 10px; padding: 3px 9px; border-radius: 20px; font-family: var(--mono); }
+.lm-tag-done { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.lm-tag-active { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
+.lm-tag-locked { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+.lm-body { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.lm-body.open { display: block; }
+.video-ph {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  height: 80px; display: flex; align-items: center; justify-content: center;
+  gap: 10px; font-size: 12px; color: var(--text3); margin-bottom: 10px;
+  cursor: pointer; transition: border-color .15s;
+}
+.video-ph:hover { border-color: var(--green); }
+.play-btn {
+  width: 30px; height: 30px; background: var(--green-dim); border: 1px solid var(--green-border);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--green);
+}
+.lm-desc { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+.lm-task {
+  background: rgba(61,220,107,.06); border: 1px solid var(--green-border);
+  border-radius: 6px; padding: 8px 12px; font-size: 11px; color: var(--green);
+  margin-bottom: 10px; font-family: var(--mono);
+}
+.lm-complete-btn {
+  background: var(--green); color: #0D1117; border: none;
+  padding: 8px 20px; border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: var(--font);
+}
+
+/* UPSELL */
+.upsell-banner {
+  background: linear-gradient(135deg, rgba(61,220,107,.08) 0%, rgba(61,220,107,.03) 100%);
+  border: 1px solid var(--green-border); border-radius: 12px;
+  padding: 24px; text-align: center; margin-top: 12px;
+}
+.upsell-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.upsell-sub { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 18px; }
+.upsell-btn {
+  background: var(--green); color: #0D1117; border: none;
+  padding: 12px 32px; border-radius: 9px; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: var(--font);
+}
+.upsell-note { font-size: 11px; color: var(--text3); margin-top: 10px; font-family: var(--mono); }
+
+/* BENACHRICHTIGUNGEN */
+.notif-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.notif-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.notif-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.notif-sub { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.toggle { width: 38px; height: 22px; background: var(--border); border-radius: 11px; cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; border: none; }
+.toggle.on { background: var(--green); }
+.toggle::after { content: ''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left .2s; }
+.toggle.on::after { left: 19px; }
+.time-select {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px; font-size: 11px; color: var(--text2);
+  font-family: var(--mono); outline: none;
+}
+.push-preview {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 7px;
+  padding: 10px 12px; font-size: 11px; color: var(--text2); line-height: 1.5; margin-top: 8px;
+}
+.push-preview strong { color: var(--text); }
+
+/* SECTION TITLE */
+.section-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .news-grid { grid-template-columns: 1fr; }
+  .j-stats { grid-template-columns: repeat(3,1fr); }
+  .detail-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">TF</div>
+    <span class="logo-name">10 Trade Ideas</span>
+    <span class="logo-sub">by TradingFreaks</span>
+  </div>
+  <div class="live-pill"><div class="live-dot"></div>Live — Mo 30. März 2026</div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="switchTab('benachrichtigungen')">🔔 Alerts</button>
+    <div class="avatar">TG</div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="sb-section">
+      <div class="sb-label">Marktlage heute</div>
+      <div class="ctx-card">
+        <div class="ctx-indicator">
+          <div class="ctx-dot" id="ctx-dot" style="background:var(--green)"></div>
+          <span style="font-size:11px;color:var(--green);font-family:var(--mono)" id="ctx-state-label">Günstig</span>
+        </div>
+        <div class="ctx-states">
+          <button class="ctx-btn active-g" id="ctx-g" onclick="setCtx('g')">Günstig</button>
+          <button class="ctx-btn" id="ctx-o" onclick="setCtx('o')">Neutral</button>
+          <button class="ctx-btn" id="ctx-r" onclick="setCtx('r')">Vorsicht</button>
+        </div>
+        <div class="ctx-text" id="ctx-text">Starke Trendstrukturen. Ideas mit normalem Risiko handeln.</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Markt</div>
+      <div class="filter-chips">
+        <button class="fchip active" onclick="setFilter(this,'mkt')">Alle</button>
+        <button class="fchip" onclick="setFilter(this,'mkt')">Aktien</button>
+        <button class="fchip" onclick="setFilter(this,'mkt')">Indizes</button>
+        <button class="fchip" onclick="setFilter(this,'mkt')">FX</button>
+        <button class="fchip" onclick="setFilter(this,'mkt')">Rohstoffe</button>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Stil</div>
+      <div class="filter-chips">
+        <button class="fchip active" onclick="setFilter(this,'sty')">Alle</button>
+        <button class="fchip" onclick="setFilter(this,'sty')">Daytrading</button>
+        <button class="fchip" onclick="setFilter(this,'sty')">Swingtrading</button>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Partnerbroker</div>
+      <div class="broker-card">
+        <div class="broker-name">GBE Brokers</div>
+        <div class="broker-tag">Empfohlener CFD-Broker</div>
+        <button class="broker-btn">Konto eröffnen →</button>
+        <div class="broker-disc">*Affiliate-Partnerschaft</div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Lernpfad</div>
+      <div class="progress-info">
+        <span>Modul 2 von 5</span>
+        <span style="color:var(--green);font-family:var(--mono)">40%</span>
+      </div>
+      <div class="pbar"><div class="pbar-fill"></div></div>
+      <div class="progress-sub">Aktiv: Chartlesen & Kerzen</div>
+    </div>
+
+    <div class="sb-section">
+      <div class="ttp-teaser">
+        <strong>🔒 Scalping + 10 Strategien</strong>
+        <span>Exklusiv im Top Trader Programm</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('ideas')">Trade Ideas</div>
+      <div class="tab" onclick="switchTab('news')">News & Kalender</div>
+      <div class="tab" onclick="switchTab('tagebuch')">Tagebuch</div>
+      <div class="tab" onclick="switchTab('lernpfad')">Lernpfad</div>
+      <div class="tab" onclick="switchTab('benachrichtigungen')">Benachrichtigungen</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== IDEAS TAB ===== -->
+      <div class="tab-pane active" id="tab-ideas">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Ideas heute</div><div class="stat-val">10</div><div class="stat-sub">aktualisiert 07:55</div></div>
+          <div class="stat-card"><div class="stat-label">Aktive Positionen</div><div class="stat-val">4</div><div class="stat-sub">von 10 aktiviert</div></div>
+          <div class="stat-card"><div class="stat-label">Nächstes Update</div><div class="stat-val">07:55</div><div class="stat-sub">morgen früh</div></div>
+          <div class="stat-card"><div class="stat-label">Märkte heute</div><div class="stat-val">DE+FX</div><div class="stat-sub">DAX & EUR im Fokus</div></div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="chip active" onclick="setChip(this)">Alle (10)</button>
+          <button class="chip" onclick="setChip(this)">Long</button>
+          <button class="chip" onclick="setChip(this)">Short</button>
+          <button class="chip" onclick="setChip(this)">Daytrading</button>
+          <button class="chip" onclick="setChip(this)">Swingtrading</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Instrument</th>
+                <th>Richtung</th>
+                <th>Stil</th>
+                <th>Einstieg</th>
+                <th>Stop Loss</th>
+                <th>Take Profit</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ideas-tbody">
+
+              <!-- Idea 1 -->
+              <tr onclick="toggleDetail(0)">
+                <td><div class="inst-name">DAX 40</div><div class="inst-type">Index</div></td>
+                <td><span class="badge b-long">Long</span></td>
+                <td><span class="badge b-day">Daytrading</span></td>
+                <td style="font-family:var(--mono)">21.240</td>
+                <td style="font-family:var(--mono);color:var(--red)">21.150</td>
+                <td style="font-family:var(--mono);color:var(--green)">21.420</td>
+                <td><span class="b-aktiv">Aktiv</span></td>
+                <td><span class="row-arrow" id="arr-0">▾</span></td>
+              </tr>
+              <tr class="detail-row" id="detail-0">
+                <td colspan="8">
+                  <div class="detail-panel">
+                    <div class="detail-grid">
+                      <div class="detail-block"><label>Einstieg</label><span style="color:var(--text)">21.240</span></div>
+                      <div class="detail-block"><label>Stop Loss</label><span style="color:var(--red)">21.150</span></div>
+                      <div class="detail-block"><label>Take Profit</label><span style="color:var(--green)">21.420</span></div>
+                    </div>
+                    <div class="analysis-box">DAX hält starken Support bei 21.200. Bullisches Momentum nach US-Daten. Einstieg bei Retest der Unterstützungszone, TP am nächsten Widerstand 21.420. Chart-Timeframe: 15 Min. Wichtiges Event heute: EZB-Protokoll 09:00 Uhr — Position danach beobachten.</div>
+                    <div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — DAX40 | 15 Min</span></div>
+                    <div class="pos-calc">
+                      <div class="pos-title">Positionsrechner</div>
+                      <div class="pos-row"><label>Kontostand (€)</label><input type="number" value="10000" id="kap-0" oninput="calcPos(0,21240,21150)"></div>
+                      <div class="pos-row"><label>Risiko (%)</label><input type="number" value="1" min="0.1" max="5" step="0.1" id="risk-0" oninput="calcPos(0,21240,21150)"></div>
+                      <div class="pos-result" id="res-0">Risikobetrag: 100 € | ca. 1% des Kontos</div>
+                    </div>
+                    <div class="broker-inline">
+                      <div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div>
+                      <button class="broker-inline-btn">Konto eröffnen →</button>
+                    </div>
+                    <div class="affiliate-note">*Affiliate-Partnerschaft</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Idea 2 -->
+              <tr onclick="toggleDetail(1)">
+                <td><div class="inst-name">EUR/USD</div><div class="inst-type">FX</div></td>
+                <td><span class="badge b-short">Short</span></td>
+                <td><span class="badge b-swing">Swingtrading</span></td>
+                <td style="font-family:var(--mono)">1.0820</td>
+                <td style="font-family:var(--mono);color:var(--red)">1.0860</td>
+                <td style="font-family:var(--mono);color:var(--green)">1.0720</td>
+                <td><span class="b-wait">Warten</span></td>
+                <td><span class="row-arrow" id="arr-1">▾</span></td>
+              </tr>
+              <tr class="detail-row" id="detail-1">
+                <td colspan="8">
+                  <div class="detail-panel">
+                    <div class="detail-grid">
+                      <div class="detail-block"><label>Einstieg</label><span style="color:var(--text)">1.0820</span></div>
+                      <div class="detail-block"><label>Stop Loss</label><span style="color:var(--red)">1.0860</span></div>
+                      <div class="detail-block"><label>Take Profit</label><span style="color:var(--green)">1.0720</span></div>
+                    </div>
+                    <div class="analysis-box">EUR/USD trifft auf Widerstand bei 1.0820–1.0840. Bearishe Divergenz im RSI auf dem Tageschart. Swing-Trade mit 2.5:1 RR. Einstieg bei Bestätigung — noch warten auf Tageskerze.</div>
+                    <div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — EURUSD | 1D</span></div>
+                    <div class="pos-calc">
+                      <div class="pos-title">Positionsrechner</div>
+                      <div class="pos-row"><label>Kontostand (€)</label><input type="number" value="10000" id="kap-1" oninput="calcPos(1,10820,10860)"></div>
+                      <div class="pos-row"><label>Risiko (%)</label><input type="number" value="1" min="0.1" max="5" step="0.1" id="risk-1" oninput="calcPos(1,10820,10860)"></div>
+                      <div class="pos-result" id="res-1">Risikobetrag: 100 € | ca. 1% des Kontos</div>
+                    </div>
+                    <div class="broker-inline">
+                      <div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div>
+                      <button class="broker-inline-btn">Konto eröffnen →</button>
+                    </div>
+                    <div class="affiliate-note">*Affiliate-Partnerschaft</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Idea 3 -->
+              <tr onclick="toggleDetail(2)">
+                <td><div class="inst-name">Gold (XAU)</div><div class="inst-type">Rohstoff</div></td>
+                <td><span class="badge b-long">Long</span></td>
+                <td><span class="badge b-swing">Swingtrading</span></td>
+                <td style="font-family:var(--mono)">3.070</td>
+                <td style="font-family:var(--mono);color:var(--red)">3.040</td>
+                <td style="font-family:var(--mono);color:var(--green)">3.140</td>
+                <td><span class="b-aktiv">Aktiv</span></td>
+                <td><span class="row-arrow" id="arr-2">▾</span></td>
+              </tr>
+              <tr class="detail-row" id="detail-2">
+                <td colspan="8">
+                  <div class="detail-panel">
+                    <div class="detail-grid">
+                      <div class="detail-block"><label>Einstieg</label><span style="color:var(--text)">3.070</span></div>
+                      <div class="detail-block"><label>Stop Loss</label><span style="color:var(--red)">3.040</span></div>
+                      <div class="detail-block"><label>Take Profit</label><span style="color:var(--green)">3.140</span></div>
+                    </div>
+                    <div class="analysis-box">Gold bricht über 3.060 aus — starker Momentum-Move. Swing-Long mit Ziel 3.140. SL unter letztem Swing-Low bei 3.040. Globale Risikoaversion stützt.</div>
+                    <div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — XAUUSD | 4H</span></div>
+                    <div class="pos-calc">
+                      <div class="pos-title">Positionsrechner</div>
+                      <div class="pos-row"><label>Kontostand (€)</label><input type="number" value="10000" id="kap-2" oninput="calcPos(2,0,0)"></div>
+                      <div class="pos-row"><label>Risiko (%)</label><input type="number" value="1" min="0.1" max="5" step="0.1" id="risk-2" oninput="calcPos(2,0,0)"></div>
+                      <div class="pos-result" id="res-2">Risikobetrag: 100 € | ca. 1% des Kontos</div>
+                    </div>
+                    <div class="broker-inline">
+                      <div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div>
+                      <button class="broker-inline-btn">Konto eröffnen →</button>
+                    </div>
+                    <div class="affiliate-note">*Affiliate-Partnerschaft</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Ideas 4-10 (kompakt) -->
+              <tr onclick="toggleDetail(3)"><td><div class="inst-name">Apple (AAPL)</div><div class="inst-type">Aktie</div></td><td><span class="badge b-long">Long</span></td><td><span class="badge b-day">Daytrading</span></td><td style="font-family:var(--mono)">214,50</td><td style="font-family:var(--mono);color:var(--red)">211,00</td><td style="font-family:var(--mono);color:var(--green)">221,00</td><td><span class="b-wait">Warten</span></td><td><span class="row-arrow" id="arr-3">▾</span></td></tr>
+              <tr class="detail-row" id="detail-3"><td colspan="8"><div class="detail-panel"><div class="analysis-box">AAPL testet Support-Zone bei 213–215. Bullisches Muster auf dem 15-Min.-Chart nach Pre-Market.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — AAPL | 15 Min</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(4)"><td><div class="inst-name">S&P 500</div><div class="inst-type">Index</div></td><td><span class="badge b-short">Short</span></td><td><span class="badge b-day">Daytrading</span></td><td style="font-family:var(--mono)">5.580</td><td style="font-family:var(--mono);color:var(--red)">5.620</td><td style="font-family:var(--mono);color:var(--green)">5.490</td><td><span class="b-wait">Warten</span></td><td><span class="row-arrow" id="arr-4">▾</span></td></tr>
+              <tr class="detail-row" id="detail-4"><td colspan="8"><div class="detail-panel"><div class="analysis-box">S&P 500 testet Widerstand bei 5.580–5.600. Short-Setup mit engem SL. Auf Bestätigung warten.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — SPX | 15 Min</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(5)"><td><div class="inst-name">GBP/USD</div><div class="inst-type">FX</div></td><td><span class="badge b-long">Long</span></td><td><span class="badge b-swing">Swingtrading</span></td><td style="font-family:var(--mono)">1.2940</td><td style="font-family:var(--mono);color:var(--red)">1.2880</td><td style="font-family:var(--mono);color:var(--green)">1.3080</td><td><span class="b-aktiv">Aktiv</span></td><td><span class="row-arrow" id="arr-5">▾</span></td></tr>
+              <tr class="detail-row" id="detail-5"><td colspan="8"><div class="detail-panel"><div class="analysis-box">GBP/USD in aufsteigendem Trendkanal. Long bei Pullback zur Unterstützung 1.2940. TP am oberen Kanalrand.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — GBPUSD | 4H</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(6)"><td><div class="inst-name">Öl (WTI)</div><div class="inst-type">Rohstoff</div></td><td><span class="badge b-short">Short</span></td><td><span class="badge b-swing">Swingtrading</span></td><td style="font-family:var(--mono)">69,80</td><td style="font-family:var(--mono);color:var(--red)">71,20</td><td style="font-family:var(--mono);color:var(--green)">66,50</td><td><span class="b-wait">Warten</span></td><td><span class="row-arrow" id="arr-6">▾</span></td></tr>
+              <tr class="detail-row" id="detail-6"><td colspan="8"><div class="detail-panel"><div class="analysis-box">WTI-Öl unter Druck nach OPEC-Meldungen. Short bei Bounce zur 69,80-Zone. SL über Widerstand 71,20.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — WTIUSD | 4H</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(7)"><td><div class="inst-name">NVIDIA (NVDA)</div><div class="inst-type">Aktie</div></td><td><span class="badge b-long">Long</span></td><td><span class="badge b-day">Daytrading</span></td><td style="font-family:var(--mono)">876</td><td style="font-family:var(--mono);color:var(--red)">855</td><td style="font-family:var(--mono);color:var(--green)">920</td><td><span class="b-aktiv">Aktiv</span></td><td><span class="row-arrow" id="arr-7">▾</span></td></tr>
+              <tr class="detail-row" id="detail-7"><td colspan="8"><div class="detail-panel"><div class="analysis-box">NVDA erholt sich nach Rücksetzer. Long-Setup mit Momentum. TP bei 920 — vorherigem Hoch.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — NVDA | 15 Min</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(8)"><td><div class="inst-name">EUR/GBP</div><div class="inst-type">FX</div></td><td><span class="badge b-short">Short</span></td><td><span class="badge b-day">Daytrading</span></td><td style="font-family:var(--mono)">0.8340</td><td style="font-family:var(--mono);color:var(--red)">0.8370</td><td style="font-family:var(--mono);color:var(--green)">0.8280</td><td><span class="b-wait">Warten</span></td><td><span class="row-arrow" id="arr-8">▾</span></td></tr>
+              <tr class="detail-row" id="detail-8"><td colspan="8"><div class="detail-panel"><div class="analysis-box">EUR/GBP an Widerstand. Short-Setup im Tages-Abwärtstrend. Enges SL über 0.8370.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — EURGBP | 15 Min</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+              <tr onclick="toggleDetail(9)"><td><div class="inst-name">Silber (XAG)</div><div class="inst-type">Rohstoff</div></td><td><span class="badge b-short">Short</span></td><td><span class="badge b-day">Daytrading</span></td><td style="font-family:var(--mono)">34,20</td><td style="font-family:var(--mono);color:var(--red)">34,90</td><td style="font-family:var(--mono);color:var(--green)">32,80</td><td><span class="b-wait">Warten</span></td><td><span class="row-arrow" id="arr-9">▾</span></td></tr>
+              <tr class="detail-row" id="detail-9"><td colspan="8"><div class="detail-panel"><div class="analysis-box">Silber zeigt bearishe Umkehrformation. Short bei 34,20 mit Ziel 32,80. Divergenz zu Gold bestätigt Setup.</div><div class="chart-placeholder"><div class="chart-icon">📊</div><span>TradingView Chart — XAGUSD | 1H</span></div><div class="broker-inline"><div class="broker-inline-text">Diese Idea handeln bei <strong>GBE Brokers</strong></div><button class="broker-inline-btn">Konto eröffnen →</button></div><div class="affiliate-note">*Affiliate-Partnerschaft</div></div></td></tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== NEWS TAB ===== -->
+      <div class="tab-pane" id="tab-news">
+        <div class="section-title">Wirtschaftskalender — gefiltert auf aktuelle Ideas</div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px">
+          <div class="cal-item"><div class="cal-time">09:00</div><div class="cal-impact cal-hi"></div><div style="flex:1"><div class="cal-title">EZB-Protokoll</div><div class="cal-curr">EUR</div></div><div class="cal-impact-label">Hoch</div></div>
+          <div class="cal-item"><div class="cal-time">14:30</div><div class="cal-impact cal-hi"></div><div style="flex:1"><div class="cal-title">US PCE Inflation</div><div class="cal-curr">USD</div></div><div class="cal-impact-label">Hoch</div></div>
+          <div class="cal-item"><div class="cal-time">15:45</div><div class="cal-impact cal-med"></div><div style="flex:1"><div class="cal-title">Chicago PMI</div><div class="cal-curr">USD</div></div><div class="cal-impact-label">Mittel</div></div>
+          <div class="cal-item"><div class="cal-time">16:00</div><div class="cal-impact cal-lo"></div><div style="flex:1"><div class="cal-title">Michigan Sentiment</div><div class="cal-curr">USD</div></div><div class="cal-impact-label">Niedrig</div></div>
+        </div>
+        <div class="section-title">Aktuelle Marktnews</div>
+        <div class="news-grid">
+          <div class="news-card"><div class="news-source">Reuters</div><div class="news-title">DAX gibt Gewinne teilweise ab — Händler warten auf PCE-Daten aus den USA</div><div class="news-time">vor 22 Min.</div></div>
+          <div class="news-card"><div class="news-source">Bloomberg</div><div class="news-title">Gold auf Rekordhoch: Sichere Häfen gefragt vor der Quartalswende</div><div class="news-time">vor 45 Min.</div></div>
+          <div class="news-card"><div class="news-source">FX Street</div><div class="news-title">EUR/USD unter Druck: EZB-Protokoll könnte weitere Hinweise liefern</div><div class="news-time">vor 1 Std.</div></div>
+          <div class="news-card"><div class="news-source">CNBC</div><div class="news-title">Apple erholt sich nach Analyst-Upgrade — Support-Zone hält bislang</div><div class="news-time">vor 2 Std.</div></div>
+        </div>
+      </div>
+
+      <!-- ===== TAGEBUCH TAB ===== -->
+      <div class="tab-pane" id="tab-tagebuch">
+        <div class="j-stats">
+          <div class="j-stat"><div class="j-val">12</div><div class="j-label">Einträge</div></div>
+          <div class="j-stat"><div class="j-val">+4.2R</div><div class="j-label">Monat</div></div>
+          <div class="j-stat"><div class="j-val">7</div><div class="j-label">Tage aktiv</div></div>
+        </div>
+        <div class="j-add">
+          <input type="text" placeholder="Instrument (z.B. DAX 40)" id="j-inst">
+          <input type="number" placeholder="+/- R" id="j-r" style="width:80px">
+          <button class="j-add-btn" onclick="addJournal()">Eintragen</button>
+        </div>
+        <div id="journal-list">
+          <div class="j-entry"><div class="j-inst">DAX 40</div><div class="j-badges"><span class="badge b-long">Long</span><span class="badge b-day" style="margin-left:4px">Day</span></div><div class="j-result j-pos">+1.8R</div></div>
+          <div class="j-entry"><div class="j-inst">EUR/USD</div><div class="j-badges"><span class="badge b-short">Short</span><span class="badge b-swing" style="margin-left:4px">Swing</span></div><div class="j-result j-pos">+2.5R</div></div>
+          <div class="j-entry"><div class="j-inst">Gold</div><div class="j-badges"><span class="badge b-long">Long</span><span class="badge b-swing" style="margin-left:4px">Swing</span></div><div class="j-result j-neg">-1.0R</div></div>
+          <div class="j-entry"><div class="j-inst">S&P 500</div><div class="j-badges"><span class="badge b-short">Short</span><span class="badge b-day" style="margin-left:4px">Day</span></div><div class="j-result j-pos">+1.2R</div></div>
+        </div>
+      </div>
+
+      <!-- ===== LERNPFAD TAB ===== -->
+      <div class="tab-pane" id="tab-lernpfad">
+
+        <div class="lm">
+          <div class="lm-header">
+            <div class="lm-num lm-done">✓</div>
+            <div><div class="lm-title">Modul 1 — Wie nutze ich 10 Trade Ideas täglich?</div><div class="lm-sub">Intro-Video · 8 Min.</div></div>
+            <div class="lm-status"><span class="lm-tag lm-tag-done">Abgeschlossen</span></div>
+          </div>
+        </div>
+
+        <div class="lm">
+          <div class="lm-header" onclick="toggleModule('mb2')">
+            <div class="lm-num lm-active">2</div>
+            <div><div class="lm-title">Modul 2 — Chartlesen & Kerzen</div><div class="lm-sub">Video · 12 Min. · Aktiv</div></div>
+            <div class="lm-status"><span class="lm-tag lm-tag-active">Aktiv</span></div>
+          </div>
+          <div class="lm-body open" id="mb2">
+            <div class="video-ph"><div class="play-btn">▶</div>Video: Chartlesen für Anfänger — Kerzen & Zonen</div>
+            <div class="lm-desc">Lerne, wie du die Trade-Ideas direkt in den Charts nachvollziehen kannst. Nach diesem Modul erkennst du Kerzenformationen und Zonen sofort.</div>
+            <div class="lm-task">Praxis: Öffne die EUR/USD-Idea und markiere den Widerstand im Chart.</div>
+            <button class="lm-complete-btn">Modul abschließen ✓</button>
+          </div>
+        </div>
+
+        <div class="lm">
+          <div class="lm-header">
+            <div class="lm-num lm-locked">3</div>
+            <div><div class="lm-title">Modul 3 — Trading vs. Investment & Broker-Eröffnung</div><div class="lm-sub">Video + GBE Brokers Setup · 15 Min.</div></div>
+            <div class="lm-status"><span class="lm-tag lm-tag-locked">🔒 Gesperrt</span></div>
+          </div>
+        </div>
+
+        <div class="lm">
+          <div class="lm-header">
+            <div class="lm-num lm-locked">4</div>
+            <div><div class="lm-title">Modul 4 — Einfache Strategie: Support & Widerstand</div><div class="lm-sub">Video · 18 Min.</div></div>
+            <div class="lm-status"><span class="lm-tag lm-tag-locked">🔒 Gesperrt</span></div>
+          </div>
+        </div>
+
+        <div class="lm">
+          <div class="lm-header">
+            <div class="lm-num lm-locked">5</div>
+            <div><div class="lm-title">Modul 5 — Risikomanagement</div><div class="lm-sub">Video · 14 Min.</div></div>
+            <div class="lm-status"><span class="lm-tag lm-tag-locked">🔒 Gesperrt</span></div>
+          </div>
+        </div>
+
+        <div class="upsell-banner">
+          <div class="upsell-title">Bereit für die nächste Stufe?</div>
+          <div class="upsell-sub">Im Top Trader Programm lernst du Scalping, 10 erprobte Strategien, Live Trading und bekommst Zugang zur Community und persönlichen Mentoren.</div>
+          <button class="upsell-btn">Top Trader Programm entdecken →</button>
+          <div class="upsell-note">Dein 10 Trade Ideas Abo wird auf den TTP-Preis angerechnet.</div>
+        </div>
+
+      </div>
+
+      <!-- ===== BENACHRICHTIGUNGEN TAB ===== -->
+      <div class="tab-pane" id="tab-benachrichtigungen">
+        <div class="section-title">Benachrichtigungs-Einstellungen</div>
+
+        <div class="notif-card">
+          <div class="notif-row">
+            <div><div class="notif-title">E-Mail</div><div class="notif-sub">Tägliche Ideas-Übersicht im Postfach</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:var(--text2)">Sendezeit:</span>
+            <select class="time-select"><option>07:45 Uhr</option><option>08:00 Uhr</option><option>08:30 Uhr</option></select>
+          </div>
+        </div>
+
+        <div class="notif-card">
+          <div class="notif-row">
+            <div><div class="notif-title">Browser Push</div><div class="notif-sub">Push wenn Ideas live gehen — 08:00 Uhr</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="push-preview">🔔 <strong>10 Trade Ideas</strong> — 10 neue Ideas sind live! DAX Long + EUR/USD Short heute im Fokus.</div>
+        </div>
+
+        <div class="notif-card">
+          <div class="notif-row">
+            <div><div class="notif-title">Telegram</div><div class="notif-sub">Übersicht im Telegram-Channel</div></div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <button style="background:none;border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:7px;font-size:11px;cursor:pointer;margin-top:8px;font-family:var(--font)">Channel verknüpfen →</button>
+        </div>
+
+        <div class="notif-card">
+          <div class="notif-row">
+            <div><div class="notif-title">Preisalert</div><div class="notif-sub">Push wenn Einstiegszone erreicht wird</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">Aktive Alerts: DAX 40 @ 21.240 · Gold @ 3.070</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab switching
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    var names = ['ideas','news','tagebuch','lernpfad','benachrichtigungen'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// Detail toggle
+var openDetail = -1;
+function toggleDetail(i) {
+  var d = document.getElementById('detail-' + i);
+  var a = document.getElementById('arr-' + i);
+  if (!d) return;
+  if (openDetail === i) {
+    d.classList.remove('open');
+    if (a) { a.classList.remove('open'); }
+    openDetail = -1;
+  } else {
+    if (openDetail >= 0) {
+      var od = document.getElementById('detail-' + openDetail);
+      var oa = document.getElementById('arr-' + openDetail);
+      if (od) od.classList.remove('open');
+      if (oa) oa.classList.remove('open');
+    }
+    d.classList.add('open');
+    if (a) a.classList.add('open');
+    openDetail = i;
+  }
+}
+
+// Context banner
+var ctxData = {
+  g: { color: '#3DDC6B', label: 'Günstig', text: 'Starke Trendstrukturen. Ideas mit normalem Risiko handeln.' },
+  o: { color: '#f59e0b', label: 'Neutral', text: 'Gemischte Signale. Positionen kleiner halten, auf guten Einstieg warten.' },
+  r: { color: '#ef4444', label: 'Vorsicht', text: 'Erhöhte Volatilität. Nur Best-Setups handeln, eng absichern.' }
+};
+function setCtx(mode) {
+  ['g','o','r'].forEach(m => {
+    var b = document.getElementById('ctx-' + m);
+    b.className = 'ctx-btn';
+    if (m === mode) b.classList.add('active-' + m);
+  });
+  var d = ctxData[mode];
+  document.getElementById('ctx-dot').style.background = d.color;
+  document.getElementById('ctx-state-label').style.color = d.color;
+  document.getElementById('ctx-state-label').textContent = d.label;
+  document.getElementById('ctx-text').textContent = d.text;
+}
+
+// Filters
+function setFilter(el, group) {
+  el.closest('.sb-section').querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function setChip(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Positionsrechner
+function calcPos(i, entry, sl) {
+  var k = parseFloat(document.getElementById('kap-' + i)?.value || 10000);
+  var r = parseFloat(document.getElementById('risk-' + i)?.value || 1);
+  if (isNaN(k) || isNaN(r)) return;
+  var risikoBetrag = Math.round(k * r / 100);
+  document.getElementById('res-' + i).textContent = 'Risikobetrag: ' + risikoBetrag.toLocaleString('de-DE') + ' € | ca. ' + r.toFixed(1) + '% des Kontos';
+}
+
+// Lernpfad
+function toggleModule(id) {
+  var b = document.getElementById(id);
+  if (b) b.classList.toggle('open');
+}
+
+// Journal
+function addJournal() {
+  var inst = document.getElementById('j-inst').value.trim();
+  var r = document.getElementById('j-r').value;
+  if (!inst || !r) return;
+  var rVal = parseFloat(r);
+  var el = document.createElement('div');
+  el.className = 'j-entry';
+  el.innerHTML = '<div class="j-inst">' + inst + '</div><div class="j-badges"><span class="badge b-long">Long</span></div><div class="j-result ' + (rVal >= 0 ? 'j-pos' : 'j-neg') + '">' + (rVal >= 0 ? '+' : '') + rVal.toFixed(1) + 'R</div>';
+  document.getElementById('journal-list').prepend(el);
+  document.getElementById('j-inst').value = '';
+  document.getElementById('j-r').value = '';
+}
+</script>
+</body>
+</html>
